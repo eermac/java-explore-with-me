@@ -14,13 +14,13 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class StatisticsServiceImpl implements StatisticsService{
+public class StatisticsServiceImpl implements StatisticsService {
     private final StatisticsRepository repository;
 
     Comparator<ResponseDto> userComparator = new Comparator<>() {
         @Override
         public int compare(ResponseDto stat1, ResponseDto stat2) {
-            if(stat1.getHits() < (stat2.getHits())) return 1;
+            if (stat1.getHits() < (stat2.getHits())) return 1;
             else return -1;
         }
     };
