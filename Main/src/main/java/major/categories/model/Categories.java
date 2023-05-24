@@ -1,24 +1,25 @@
-package statistics.model;
+package major.categories.model;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "statistics", schema = "public")
+@Table(name = "categories", schema = "public")
 @Getter
 @AllArgsConstructor
 @Setter
 @ToString
-public class Statistics {
+public class Categories {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String app;
-    private String uri;
-    private String ip;
-    private LocalDateTime created;
+    private String name;
+
+    public Categories() {
+        super();
+    }
 }

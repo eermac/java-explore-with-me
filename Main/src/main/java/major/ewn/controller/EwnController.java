@@ -1,7 +1,7 @@
-package ewn.controller;
+package major.ewn.controller;
 
-import ewn.StatsClient;
-import ewn.dto.StatisticsDto;
+import major.ewn.StatsClient;
+import major.ewn.dto.StatisticsDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

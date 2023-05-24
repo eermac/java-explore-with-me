@@ -1,4 +1,4 @@
-package ewn.client;
+package major.ewn.client;
 
 import java.util.List;
 import java.util.Map;

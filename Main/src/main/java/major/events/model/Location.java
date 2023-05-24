@@ -1,24 +1,26 @@
-package statistics.model;
+package major.events.model;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "statistics", schema = "public")
+@Table(name = "location", schema = "public")
 @Getter
 @AllArgsConstructor
 @Setter
 @ToString
-public class Statistics {
+public class Location {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String app;
-    private String uri;
-    private String ip;
-    private LocalDateTime created;
+    private Double lat;
+    private Double lon;
+
+    public Location() {
+        super();
+    }
 }
