@@ -6,7 +6,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.Set;
 
 public interface EventRepository extends JpaRepository<Event, Long> {
     @Query("Select e from Event e where e.initiator.id = ?1")
@@ -16,5 +17,10 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     Event getEvent(Long userId, Long eventId);
 
     @Query("Select e from Event e where e.id in (?1)")
-    List<Event> getEventsById(Long[] eventsId);
+    Set<Event> getEventsById(Long[] eventsId);
+
+    @Query("Select e from Event e where e.initiator.id in (?1) AND " +
+            "((?2 = 'PUBLISHED' AND e.state = 'PUBLISHED') OR (?2 = 'PENDING' AND e.state = 'PENDING')) " +
+            "AND e.category.id in (?3) AND (e.eventDate BETWEEN ?4 AND ?5) ")
+    Page<Event> getEventsWithFilter(Long[] users, String state, Long[] category, LocalDateTime startDate, LocalDateTime endDate, Pageable page);
 }

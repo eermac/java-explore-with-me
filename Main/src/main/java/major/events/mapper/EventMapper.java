@@ -9,7 +9,6 @@ import major.users.model.User;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 
 public class EventMapper {
     public static Event map(EventDto dto, User user, Categories categories) {
@@ -27,6 +26,7 @@ public class EventMapper {
                 LocalDateTime.now(),
                 dto.getLocation(),
                 dto.getRequestModeration(),
+                LocalDateTime.parse(dto.getEventDate(), formatter).minusYears(100),
                 0L,
                 0L);
     }
@@ -38,14 +38,15 @@ public class EventMapper {
                 event.getAnnotation(),
                 event.getCategory(),
                 event.getPaid(),
-                event.getEventDate().format(formatter),
+                event.getEventDate().toString(),
                 event.getInitiator(),
                 event.getDescription(),
                 event.getParticipantLimit(),
                 event.getState(),
-                event.getCreatedOn(),
+                event.getCreatedOn().format(formatter),
                 event.getLocation(),
                 event.getRequestModeration(),
+                event.getPublishedOn().format(formatter),
                 event.getConfirmedRequests(),
                 event.getViews());
     }

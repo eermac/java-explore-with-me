@@ -104,4 +104,16 @@ public class UserController {
         log.info("Редактирование данных события");
         return service.updateEventOnAdmin(eventId, dto);
     }
+
+    @GetMapping("/admin/events")
+    public List<EventDtoFull> getEventsForAdmin(@RequestParam(name = "users", defaultValue = "") Long[] users,
+                                         @RequestParam(name = "states", defaultValue = "") String states,
+                                         @RequestParam(name = "categories", defaultValue = "") Long[] categories,
+                                         @RequestParam(name = "rangeStart", defaultValue = "1970-01-01 00:00:00") String rangeStart,
+                                         @RequestParam(name = "rangeEnd", defaultValue = "1970-01-01 00:00:00") String rangeEnd,
+                                         @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
+                                         @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
+        log.info("Поиск событий");
+        return service.getEventsForAdmin(users, states, categories, rangeStart, rangeEnd, from, size);
+    }
 }

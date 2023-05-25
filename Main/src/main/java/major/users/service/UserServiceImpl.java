@@ -26,6 +26,9 @@ import major.users.model.User;
 import major.users.repository.UserRepository;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -49,7 +52,9 @@ public class UserServiceImpl implements UserService{
             Categories categories= categoriesRepository.findById(dto.getCategory()).get();
             locationRepository.save(dto.getLocation());
             Event event = eventRepository.save(EventMapper.map(dto, repository.findById(userId).get(), categories));
-            return EventMapper.map(event);
+            EventDtoFull eventDtoFull = EventMapper.map(event);
+            eventDtoFull.setEventDate(dto.getEventDate());
+            return eventDtoFull;
     }
 
     @Override
@@ -118,8 +123,26 @@ public class UserServiceImpl implements UserService{
     @Override
     public Event updateEventOnAdmin(Long eventId, EventDtoState dto) {
         Event event = eventRepository.findById(eventId).get();
-        if (dto.getStateAction().equals("PUBLISH_EVENT")) event.setState(EventState.PUBLISHED);
-        else event.setState(EventState.CANCELED);
+        if (dto.getStateAction().equals("PUBLISH_EVENT")) {
+            event.setState(EventState.PUBLISHED);
+            event.setPublishedOn(LocalDateTime.now());
+        } else event.setState(EventState.CANCELED);
         return eventRepository.save(event);
+    }
+
+    @Override
+    public List<EventDtoFull> getEventsForAdmin(Long[] users, String states, Long[] categories, String rangeStart, String rangeEnd, Integer from, Integer size) {
+        PageRequest page = PageRequest.of(from > 0 ? from / size : 0, size);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime rangeStartFormat = LocalDateTime.parse(rangeStart, formatter);
+        LocalDateTime rangeEndFormat = LocalDateTime.parse(rangeEnd, formatter);
+        List<Event> eventList = eventRepository.getEventsWithFilter(users, states, categories, rangeStartFormat, rangeEndFormat, page).getContent();
+        List<EventDtoFull> eventDtoFulls = new ArrayList<>();
+
+        for (Event next: eventList) {
+            eventDtoFulls.add(EventMapper.map(next));
+        }
+
+        return eventDtoFulls;
     }
 }

@@ -7,8 +7,6 @@ import major.events.model.EventState;
 import major.events.model.Location;
 import major.users.model.User;
 
-import java.time.LocalDateTime;
-
 @AllArgsConstructor
 @Data
 public class EventDtoFull {
@@ -22,9 +20,10 @@ public class EventDtoFull {
     private String description;
     private Long participantLimit;
     private EventState state;
-    private LocalDateTime createdOn;
+    private String createdOn;
     private Location location;
     private Boolean requestModeration;
+    private String publishedOn;
     private Long confirmedRequests;
     private Long views;
 }

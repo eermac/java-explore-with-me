@@ -27,8 +27,6 @@ public class EwnController {
 
         log.info("\n!!!!all\n" + statisticsDto + "\n!!!\n");
 
-        //statsClient.saveStats(statisticsDto);
-
         return statsClient.saveStats(statisticsDto);
     }
 

@@ -4,7 +4,6 @@ import major.events.dto.EventDto;
 import major.events.dto.EventDtoFull;
 import major.events.dto.EventDtoState;
 import major.events.model.Event;
-import major.events.model.EventState;
 import major.requests.dto.RequestDto;
 import major.requests.model.Request;
 import major.users.dto.UserDto;
@@ -38,4 +37,6 @@ public interface UserService {
     void deleteUserOnAdmin(Long userID);
 
     Event updateEventOnAdmin(Long eventId, EventDtoState dto);
+
+    List<EventDtoFull> getEventsForAdmin(Long[] users, String states, Long[] categories, String rangeStart, String rangeEnd, Integer from, Integer size);
 }

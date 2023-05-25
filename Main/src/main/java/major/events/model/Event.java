@@ -43,6 +43,8 @@ public class Event {
     private Location location;
     @Column(name = "request_moderation")
     private Boolean requestModeration;
+    @Column(name = "published")
+    private LocalDateTime publishedOn;
     @Column(name = "confirmed_requests")
     private Long confirmedRequests;
     private Long views;

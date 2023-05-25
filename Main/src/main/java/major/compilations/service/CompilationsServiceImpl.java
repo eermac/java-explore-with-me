@@ -14,17 +14,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class CompilationsServiceImpl implements CompilationsService{
+public class CompilationsServiceImpl implements CompilationsService {
     private final CompilationsRepository repository;
     private final EventRepository eventRepository;
 
     @Override
     public Compilations add(CompilationsDto dto) {
-        List<Event> events = eventRepository.getEventsById(dto.getEvents());
+        Set<Event> events = eventRepository.getEventsById(dto.getEvents());
         return repository.save(CompilationsMapper.map(dto, events));
     }
 
@@ -35,12 +36,16 @@ public class CompilationsServiceImpl implements CompilationsService{
 
     @Override
     public Compilations update(Long compId, CompilationsDto dto) {
-        log.info("\n!!!!Обновление подборки\n");
-        List<Event> events = eventRepository.getEventsById(dto.getEvents());
-        Compilations updateCompilations = CompilationsMapper.map(dto, events);
-        updateCompilations.setId(compId);
-        log.info("\n!!!Обновление подборки\n");
-        return repository.save(updateCompilations);
+        Compilations oldCompilation = repository.findById(compId).get();
+
+        if (dto.getTitle() != null) oldCompilation.setTitle(dto.getTitle());
+        if (dto.getPinned() != null) oldCompilation.setPinned(dto.getPinned());
+        if (dto.getEvents() != null) {
+            Set<Event> events = eventRepository.getEventsById(dto.getEvents());
+            oldCompilation.setEvents(events);
+        }
+
+        return repository.save(oldCompilation);
     }
 
     @Override

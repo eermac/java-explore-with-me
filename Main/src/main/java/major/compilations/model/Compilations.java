@@ -7,7 +7,7 @@ import lombok.ToString;
 import major.events.model.Event;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "compilations", schema = "public")
@@ -19,8 +19,11 @@ public class Compilations {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Transient
-    private List<Event> events; //many to many
+    @ManyToMany
+    @JoinTable(name = "compilations_events",
+            joinColumns = { @JoinColumn(name = "compilations_id")},
+            inverseJoinColumns = { @JoinColumn(name = "event_id")})
+    private Set<Event> events;
     private Boolean pinned;
     private String title;
 
