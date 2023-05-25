@@ -8,5 +8,7 @@ import lombok.Data;
 public class EventDtoState {
     private String stateAction;
 
-    public EventDtoState() {}
+    public EventDtoState() {
+
+    }
 }

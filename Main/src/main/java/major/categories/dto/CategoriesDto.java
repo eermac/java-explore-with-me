@@ -17,5 +17,7 @@ public class CategoriesDto {
     @Size(max = 50)
     private String name;
 
-    public CategoriesDto() {}
+    public CategoriesDto() {
+
+    }
 }

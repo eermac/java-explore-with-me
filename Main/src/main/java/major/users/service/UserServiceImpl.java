@@ -34,7 +34,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
     private final UserRepository repository;
     private final EventRepository eventRepository;
     private final LocationRepository locationRepository;
@@ -49,7 +49,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public EventDtoFull addEventOnUser(Long userId, EventDto dto) {
-            Categories categories= categoriesRepository.findById(dto.getCategory()).get();
+            Categories categories = categoriesRepository.findById(dto.getCategory()).get();
             locationRepository.save(dto.getLocation());
             Event event = eventRepository.save(EventMapper.map(dto, repository.findById(userId).get(), categories));
             EventDtoFull eventDtoFull = EventMapper.map(event);
