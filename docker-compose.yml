@@ -8,6 +8,18 @@ services:
       - "8080:8080"
     depends_on:
       - stats-server
+      - major-db
+  environment:
+    SPRING_DATASOURCE_URL: jdbc:postgresql://major:5432/major
+  major-db:
+    image: postgres:14-alpine
+    container_name: major
+    ports:
+      - "6542:5432"
+    environment:
+      - POSTGRES_DB=major
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
   stats-server:
     build: Statistics
     image: "statistics"
