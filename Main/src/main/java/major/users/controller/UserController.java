@@ -8,7 +8,6 @@ import major.events.model.Event;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import major.requests.dto.RequestDto;
-import major.requests.model.Request;
 import major.users.dto.UserDto;
 import major.users.model.User;
 import major.users.service.UserService;
