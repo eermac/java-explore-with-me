@@ -1,13 +1,11 @@
 package major.ewn.controller;
 
 import major.events.dto.EventDtoFull;
-import major.events.model.Event;
 import major.events.service.EventsService;
 import major.ewn.StatsClient;
 import major.ewn.dto.StatisticsDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -41,7 +39,7 @@ public class EwnController {
                 request.getRemoteAddr(),
                 LocalDateTime.now().format(formatter));
 
-       // statsClient.saveStats(statisticsDto);
+        statsClient.saveStats(statisticsDto);
 
         return eventsService.getEvents(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
     }
@@ -54,7 +52,7 @@ public class EwnController {
                 request.getRemoteAddr(),
                 LocalDateTime.now().format(formatter));
 
-        //statsClient.saveStats(statisticsDto);
+        statsClient.saveStats(statisticsDto);
 
         return eventsService.getEvent(id);
     }

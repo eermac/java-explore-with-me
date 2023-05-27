@@ -30,7 +30,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -143,7 +142,7 @@ public class UserServiceImpl implements UserService {
         List<Request> requestList = requestRepository.getRequestsForUser(userId);
         List<RequestDto> requestDtoList = new ArrayList<>();
 
-        for(Request next: requestList) {
+        for (Request next: requestList) {
             requestDtoList.add(RequestMapper.map(next));
         }
 

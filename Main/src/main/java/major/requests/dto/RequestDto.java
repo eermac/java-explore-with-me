@@ -2,11 +2,7 @@ package major.requests.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import major.events.model.Event;
-import major.users.model.User;
 
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import java.time.LocalDateTime;
 
 @AllArgsConstructor

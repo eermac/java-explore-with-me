@@ -1,7 +1,6 @@
 package major.events.service;
 
 import major.events.dto.EventDtoFull;
-import major.events.model.Event;
 
 import java.util.List;
 

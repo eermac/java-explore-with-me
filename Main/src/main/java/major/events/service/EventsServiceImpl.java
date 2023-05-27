@@ -20,7 +20,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class EventsServiceImpl implements EventsService{
+public class EventsServiceImpl implements EventsService {
     private final EventRepository eventRepository;
 
     @Override

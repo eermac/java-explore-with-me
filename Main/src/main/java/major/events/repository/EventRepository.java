@@ -27,7 +27,6 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     @Query("Select e from Event e where " +
             "(upper(e.description) like upper(concat('%', ?1, '%')) or upper(e.annotation) like upper(concat('%', ?1, '%'))) " +
             "AND e.category.id in (?2) AND e.paid = ?3 AND (e.eventDate BETWEEN ?4 AND ?5) " +
-            "and ?6 = false" )
-           // "AND ((e.participantLimit > e.confirmedRequests) = ?6)")
+            "and ?6 = false")
     Page<Event> getEventsPublic(String text, Long[] category, Boolean paid, LocalDateTime startDate, LocalDateTime endDate, Boolean onlyAvailable, Pageable page);
 }
