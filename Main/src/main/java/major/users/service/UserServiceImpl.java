@@ -5,6 +5,7 @@ import major.categories.repository.CategoriesRepository;
 import major.events.dto.EventDto;
 import major.events.dto.EventDtoFull;
 import major.events.dto.EventDtoState;
+import major.events.dto.RequestsStatus;
 import major.events.mapper.EventMapper;
 import major.events.model.Event;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -49,12 +51,23 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public EventDtoFull addEventOnUser(Long userId, EventDto dto) {
-            Categories categories = categoriesRepository.findById(dto.getCategory()).get();
-            locationRepository.save(dto.getLocation());
-            Event event = eventRepository.save(EventMapper.map(dto, repository.findById(userId).get(), categories));
-            EventDtoFull eventDtoFull = EventMapper.map(event);
-            eventDtoFull.setEventDate(dto.getEventDate());
-            return eventDtoFull;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        if (dto.getEventDate() != null
+                && LocalDateTime.parse(dto.getEventDate(), formatter).isBefore(LocalDateTime.now())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+
+        if (dto.getPaid() == null) dto.setPaid(false);
+        if (dto.getParticipantLimit() == null) dto.setParticipantLimit(0L);
+        if (dto.getRequestModeration() == null) dto.setRequestModeration(true);
+
+        Categories categories = categoriesRepository.findById(dto.getCategory()).get();
+        locationRepository.save(dto.getLocation());
+        Event event = eventRepository.save(EventMapper.map(dto, repository.findById(userId).get(), categories));
+        EventDtoFull eventDtoFull = EventMapper.map(event);
+        eventDtoFull.setEventDate(dto.getEventDate());
+        return eventDtoFull;
     }
 
     @Override
@@ -63,39 +76,106 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Event updateEventOnUser(Long userId, Long eventId, EventDto dto) {
-        return null;
+    public EventDtoFull updateEventOnUser(Long userId, Long eventId, EventDtoState dto) {
+        Event event = eventRepository.findById(eventId).get();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        Categories categories = new Categories();
+
+        if (dto.getEventDate() != null
+                && LocalDateTime.parse(dto.getEventDate(), formatter).isBefore(LocalDateTime.now())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+
+        if (event.getState().equals(EventState.PUBLISHED)) throw new ResponseStatusException(HttpStatus.CONFLICT);
+
+        if (event.getState().equals(EventState.PENDING)) {
+            event.setState(EventState.CANCELED);
+        } else if (dto.getStateAction() != null && dto.getStateAction().equals("SEND_TO_REVIEW")) {
+            event.setState(EventState.PENDING);
+        }
+
+        if (dto.getCategory() != null) {
+            categories = categoriesRepository.findById(dto.getCategory()).get();
+        } else categories = categoriesRepository.findById(event.getCategory().getId()).get();
+        EventDtoFull updateEvent = EventMapper.map(event);
+        eventRepository.save(EventMapper.map(updateEvent, event, categories));
+
+
+
+        return updateEvent;
     }
 
     @Override
-    public List<Request> getRequestsForUserOnEvent(Long userId, Long eventId) {
-        return null;
+    public List<RequestDto> getRequestsForUserOnEvent(Long userId, Long eventId) {
+        List<Request> request = requestRepository.getRequestOnEventForUser(eventId);
+        List<RequestDto> requestDtoList = new ArrayList<>();
+
+        for (Request next: request) {
+            requestDtoList.add(RequestMapper.map(next));
+        }
+
+        return requestDtoList;
     }
 
     @Override
-    public Request updateRequestOnUser(Long userId, Long eventId, RequestDto dto) {
-        return null;
+    public List<RequestDto> updateRequestsForUserOnEvent(Long userId, Long eventId, RequestsStatus ids) {
+        List<Request> requestList = requestRepository.getRequests(ids.getRequestIds());
+        Event event = eventRepository.findById(eventId).get();
+        List<RequestDto> requestDtoList = new ArrayList<>();
+
+        for (Request next: requestList) {
+            next.setStatus(ids.getStatus());
+            if (event.getConfirmedRequests() >= event.getParticipantLimit()) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT);
+            } else {
+                requestRepository.save(next);
+                event.setConfirmedRequests(event.getConfirmedRequests() + 1);
+                eventRepository.save(event);
+                requestDtoList.add(RequestMapper.map(next));
+            }
+        }
+
+        return requestDtoList;
     }
 
     @Override
-    public List<Request> getRequestsForUser(Long userId) {
-        return requestRepository.getRequestsForUser(userId);
+    public List<RequestDto> getRequestsForUser(Long userId) {
+        List<Request> requestList = requestRepository.getRequestsForUser(userId);
+        List<RequestDto> requestDtoList = new ArrayList<>();
+
+        for(Request next: requestList) {
+            requestDtoList.add(RequestMapper.map(next));
+        }
+
+        return requestDtoList;
     }
 
     @Override
-    public Request addRequestOnUser(Long userId, Long eventId) {
-        User requester = repository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        log.info("\n!!!!\n" + requester + "\n!!!\n");
+    public RequestDto addRequestOnUser(Long userId, Long eventId) {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        log.info("\n!!!!\n" + event + "\n!!!\n");
-        return requestRepository.save(RequestMapper.map(requester, event));
+        User requester = repository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        if (requestRepository.getRequestsForUser(userId, eventId) != null
+                || event.getInitiator().getId().equals(userId)
+                || !event.getState().equals(EventState.PUBLISHED)
+            //    || requestRepository.getRequestOnEventForUser(eventId).size() >= event.getParticipantLimit()
+                ) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT);
+        }
+
+        Request request = RequestMapper.map(requester, event);
+        request.setStatus("CONFIRMED");
+        requestRepository.save(request);
+
+        return RequestMapper.map(request);
     }
 
     @Override
-    public Request cancelRequestOnUser(Long userId, Long requestId) {
+    public RequestDto cancelRequestOnUser(Long userId, Long requestId) {
         Request request = requestRepository.findById(requestId).get();
-        request.setStatus("CANCEL");
-        return requestRepository.save(request);
+        request.setStatus("CANCELED");
+        requestRepository.save(request);
+        return RequestMapper.map(request);
     }
 
     @Override
@@ -121,13 +201,37 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Event updateEventOnAdmin(Long eventId, EventDtoState dto) {
+    public EventDtoFull updateEventOnAdmin(Long eventId, EventDtoState dto) {
         Event event = eventRepository.findById(eventId).get();
-        if (dto.getStateAction().equals("PUBLISH_EVENT")) {
-            event.setState(EventState.PUBLISHED);
-            event.setPublishedOn(LocalDateTime.now());
-        } else event.setState(EventState.CANCELED);
-        return eventRepository.save(event);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        Categories categories = new Categories();
+
+        if (dto.getEventDate() != null
+                && LocalDateTime.parse(dto.getEventDate(), formatter).isBefore(LocalDateTime.now())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+
+        if (dto.getCategory() != null) {
+             categories = categoriesRepository.findById(dto.getCategory()).get();
+        }
+
+        Event newEvent = EventMapper.map(event, dto, categories);
+
+        if (newEvent.getState().equals(EventState.PUBLISHED) || newEvent.getState().equals(EventState.CANCELED)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT);
+        }
+
+        if (dto.getStateAction() != null && dto.getStateAction().equals("PUBLISH_EVENT")) {
+            newEvent.setState(EventState.PUBLISHED);
+            newEvent.setPublishedOn(LocalDateTime.now());
+        } else newEvent.setState(EventState.CANCELED);
+
+        if (dto.getLocation() != null) locationRepository.save(dto.getLocation());
+        eventRepository.save(newEvent);
+        EventDtoFull eventDto = EventMapper.map(event);
+        String newDate = event.getEventDate().format(formatter);
+        eventDto.setEventDate(newDate);
+        return eventDto;
     }
 
     @Override

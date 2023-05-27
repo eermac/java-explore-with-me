@@ -1,5 +1,8 @@
 package major.ewn.controller;
 
+import major.events.dto.EventDtoFull;
+import major.events.model.Event;
+import major.events.service.EventsService;
 import major.ewn.StatsClient;
 import major.ewn.dto.StatisticsDto;
 import lombok.RequiredArgsConstructor;
@@ -8,40 +11,51 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
 @Slf4j
 public class EwnController {
     private final StatsClient statsClient;
+    private final EventsService eventsService;
 
     @GetMapping("/events")
-    public ResponseEntity<Object> getEvents(HttpServletRequest request) {
+    public List<EventDtoFull> getEvents(@RequestParam(name = "text", defaultValue = "") String text,
+                                        @RequestParam(name = "categories", defaultValue = "") Long[] categories,
+                                        @RequestParam(name = "paid", defaultValue = "") String paid,
+                                        @RequestParam(name = "rangeStart", defaultValue = "1970-01-01 00:00:00") String rangeStart,
+                                        @RequestParam(name = "rangeEnd", defaultValue = "1970-02-01 00:00:00") String rangeEnd,
+                                        @RequestParam(name = "onlyAvailable", defaultValue = "false") String onlyAvailable,
+                                        @RequestParam(name = "sort", defaultValue = "0") String sort,
+                                        @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
+                                        @Positive @RequestParam(name = "size", defaultValue = "10") Integer size,
+                                        HttpServletRequest request) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         StatisticsDto statisticsDto = new StatisticsDto("ewn-main-service",
                 request.getRequestURI(),
                 request.getRemoteAddr(),
                 LocalDateTime.now().format(formatter));
 
-        log.info("\n!!!!all\n" + statisticsDto + "\n!!!\n");
+       // statsClient.saveStats(statisticsDto);
 
-        return statsClient.saveStats(statisticsDto);
+        return eventsService.getEvents(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
     }
 
     @GetMapping("/events/{id}")
-    public ResponseEntity<Object> getEventsId(@PathVariable Long id, HttpServletRequest request) {
+    public EventDtoFull getEventsId(@PathVariable Long id, HttpServletRequest request) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         StatisticsDto statisticsDto = new StatisticsDto("ewn-main-service",
                 request.getRequestURI(),
                 request.getRemoteAddr(),
                 LocalDateTime.now().format(formatter));
 
-        log.info("\n!!!!id\n" + statisticsDto + "\n!!!\n");
+        //statsClient.saveStats(statisticsDto);
 
-        statsClient.saveStats(statisticsDto);
-
-        return null;
+        return eventsService.getEvent(id);
     }
 }

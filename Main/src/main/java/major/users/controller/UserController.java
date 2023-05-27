@@ -3,9 +3,11 @@ package major.users.controller;
 import major.events.dto.EventDto;
 import major.events.dto.EventDtoFull;
 import major.events.dto.EventDtoState;
+import major.events.dto.RequestsStatus;
 import major.events.model.Event;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import major.requests.dto.RequestDto;
 import major.requests.model.Request;
 import major.users.dto.UserDto;
 import major.users.model.User;
@@ -46,33 +48,39 @@ public class UserController {
     }
 
     @PatchMapping("/users/{userId}/events/{eventId}")
-    public Event updateEventOnUser(@PathVariable Long userId,
+    public EventDtoFull updateEventOnUser(@PathVariable Long userId,
                                 @PathVariable Long eventId,
-                                @Valid @RequestBody EventDto dto) {
+                                @Valid @RequestBody EventDtoState dto) {
         log.info("Обновление события от текущего пользователя");
         return service.updateEventOnUser(userId, eventId, dto);
     }
 
     @GetMapping("/users/{userId}/events/{eventId}/requests")
-    public List<Request> getRequestsForUserOnEvent(@PathVariable Long userId, @PathVariable Long eventId) {
+    public List<RequestDto> getRequestsForUserOnEvent(@PathVariable Long userId, @PathVariable Long eventId) {
         log.info("Получаем запросы на событие текущего пользователя");
         return service.getRequestsForUserOnEvent(userId, eventId);
     }
 
+    @PatchMapping("/users/{userId}/events/{eventId}/requests")
+    public List<RequestDto> updateRequestsForUserOnEvent(@PathVariable Long userId, @PathVariable Long eventId, @RequestBody RequestsStatus ids) {
+        log.info("Обновляем запросы на событие текущего пользователя");
+        return service.updateRequestsForUserOnEvent(userId, eventId, ids);
+    }
+
     @GetMapping("/users/{userId}/requests")
-    public List<Request> getRequestsForUser(@PathVariable Long userId) {
+    public List<RequestDto> getRequestsForUser(@PathVariable Long userId) {
         log.info("Получаем запросы текущего пользователя");
         return service.getRequestsForUser(userId);
     }
 
     @PostMapping("/users/{userId}/requests")
-    public ResponseEntity<Request> addRequestOnUser(@PathVariable Long userId, @RequestParam(name = "eventId") Long eventId) {
+    public ResponseEntity<RequestDto> addRequestOnUser(@PathVariable Long userId, @RequestParam(name = "eventId") Long eventId) {
         log.info("Добавление нового запроса от текущего пользователя");
         return new ResponseEntity<>(service.addRequestOnUser(userId, eventId), HttpStatus.CREATED);
     }
 
     @PatchMapping("/users/{userId}/requests/{requestId}/cancel")
-    public Request cancelRequestOnUser(@PathVariable Long userId,
+    public RequestDto cancelRequestOnUser(@PathVariable Long userId,
                                        @PathVariable Long requestId) {
         log.info("Изменение статуса запроса от текущего пользователя");
         return service.cancelRequestOnUser(userId, requestId);
@@ -100,17 +108,17 @@ public class UserController {
     }
 
     @PatchMapping("/admin/events/{eventId}")
-    public Event updateEventOnAdmin(@PathVariable Long eventId, @Valid @RequestBody EventDtoState dto) {
+    public EventDtoFull updateEventOnAdmin(@PathVariable Long eventId, @Valid @RequestBody EventDtoState dto) {
         log.info("Редактирование данных события");
         return service.updateEventOnAdmin(eventId, dto);
     }
 
     @GetMapping("/admin/events")
-    public List<EventDtoFull> getEventsForAdmin(@RequestParam(name = "users", defaultValue = "") Long[] users,
-                                         @RequestParam(name = "states", defaultValue = "") String states,
-                                         @RequestParam(name = "categories", defaultValue = "") Long[] categories,
+    public List<EventDtoFull> getEventsForAdmin(@RequestParam(name = "users", defaultValue = "0") Long[] users,
+                                         @RequestParam(name = "states", defaultValue = "0") String states,
+                                         @RequestParam(name = "categories", defaultValue = "0") Long[] categories,
                                          @RequestParam(name = "rangeStart", defaultValue = "1970-01-01 00:00:00") String rangeStart,
-                                         @RequestParam(name = "rangeEnd", defaultValue = "1970-01-01 00:00:00") String rangeEnd,
+                                         @RequestParam(name = "rangeEnd", defaultValue = "1970-02-01 00:00:00") String rangeEnd,
                                          @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
                                          @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
         log.info("Поиск событий");

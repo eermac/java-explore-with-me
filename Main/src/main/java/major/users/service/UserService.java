@@ -3,9 +3,9 @@ package major.users.service;
 import major.events.dto.EventDto;
 import major.events.dto.EventDtoFull;
 import major.events.dto.EventDtoState;
+import major.events.dto.RequestsStatus;
 import major.events.model.Event;
 import major.requests.dto.RequestDto;
-import major.requests.model.Request;
 import major.users.dto.UserDto;
 import major.users.model.User;
 
@@ -18,17 +18,17 @@ public interface UserService {
 
     Event getEventForUser(Long userId, Long eventId);
 
-    Event updateEventOnUser(Long userId, Long eventId, EventDto dto);
+    EventDtoFull updateEventOnUser(Long userId, Long eventId, EventDtoState dto);
 
-    List<Request> getRequestsForUserOnEvent(Long userId, Long eventId);
+    List<RequestDto> getRequestsForUserOnEvent(Long userId, Long eventId);
 
-    Request updateRequestOnUser(Long userId, Long eventId, RequestDto dto);
+    List<RequestDto> updateRequestsForUserOnEvent(Long userId, Long eventId, RequestsStatus ids);
 
-    List<Request> getRequestsForUser(Long userId);
+    List<RequestDto> getRequestsForUser(Long userId);
 
-    Request addRequestOnUser(Long userId, Long eventId);
+    RequestDto addRequestOnUser(Long userId, Long eventId);
 
-    Request cancelRequestOnUser(Long userId, Long requestId);
+    RequestDto cancelRequestOnUser(Long userId, Long requestId);
 
     List<User> getUsersOnAdmin(Long[] users, Integer from, Integer size);
 
@@ -36,7 +36,7 @@ public interface UserService {
 
     void deleteUserOnAdmin(Long userID);
 
-    Event updateEventOnAdmin(Long eventId, EventDtoState dto);
+    EventDtoFull updateEventOnAdmin(Long eventId, EventDtoState dto);
 
     List<EventDtoFull> getEventsForAdmin(Long[] users, String states, Long[] categories, String rangeStart, String rangeEnd, Integer from, Integer size);
 }
