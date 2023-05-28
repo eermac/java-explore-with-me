@@ -30,7 +30,9 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -160,8 +162,19 @@ public class UserServiceImpl implements UserService {
             throw new ResponseStatusException(HttpStatus.CONFLICT);
         }
 
+        if (event.getRequestModeration()) {
+            if (event.getConfirmedRequests() > event.getParticipantLimit()) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT);
+            }
+        } else {
+            if (requestRepository.getRequestOnEventForUser(eventId).size() >= event.getParticipantLimit()) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT);
+            }
+        }
+
         Request request = RequestMapper.map(requester, event);
         request.setStatus("PENDING");
+        if (event.getParticipantLimit() == 0) request.setStatus("CONFIRMED");
         requestRepository.save(request);
 
         return RequestMapper.map(request);
@@ -237,13 +250,18 @@ public class UserServiceImpl implements UserService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime rangeStartFormat = LocalDateTime.parse(rangeStart, formatter);
         LocalDateTime rangeEndFormat = LocalDateTime.parse(rangeEnd, formatter);
-        List<Event> eventList = eventRepository.getEventsWithFilter(users, states, categories, rangeStartFormat, rangeEndFormat, page).getContent();
-        List<EventDtoFull> eventDtoFulls = new ArrayList<>();
-
-        for (Event next: eventList) {
-            eventDtoFulls.add(EventMapper.map(next));
+        List<Event> eventList;
+        List<EventDtoFull> dto = new ArrayList<>();
+        if (users[0] == 0) {
+            eventList = eventRepository.findAll(page).getContent();
+        } else {
+            eventList = eventRepository.getEventsWithFilter(users, states, categories, rangeStartFormat, rangeEndFormat, page).getContent();
         }
 
-        return eventDtoFulls;
+        for (Event next: eventList) {
+            dto.add(EventMapper.map(next));
+        }
+
+        return dto;
     }
 }

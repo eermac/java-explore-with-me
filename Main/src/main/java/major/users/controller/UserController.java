@@ -114,12 +114,12 @@ public class UserController {
 
     @GetMapping("/admin/events")
     public List<EventDtoFull> getEventsForAdmin(@RequestParam(name = "users", defaultValue = "0") Long[] users,
-                                         @RequestParam(name = "states", defaultValue = "0") String states,
-                                         @RequestParam(name = "categories", defaultValue = "0") Long[] categories,
-                                         @RequestParam(name = "rangeStart", defaultValue = "1970-01-01 00:00:00") String rangeStart,
-                                         @RequestParam(name = "rangeEnd", defaultValue = "1970-02-01 00:00:00") String rangeEnd,
-                                         @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
-                                         @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
+                                                      @RequestParam(name = "states", defaultValue = "0") String states,
+                                                      @RequestParam(name = "categories", defaultValue = "0") Long[] categories,
+                                                      @RequestParam(name = "rangeStart", defaultValue = "1970-01-01 00:00:00") String rangeStart,
+                                                      @RequestParam(name = "rangeEnd", defaultValue = "1970-02-01 00:00:00") String rangeEnd,
+                                                      @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
+                                                      @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
         log.info("Поиск событий");
         return service.getEventsForAdmin(users, states, categories, rangeStart, rangeEnd, from, size);
     }

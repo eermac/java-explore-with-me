@@ -14,7 +14,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -24,7 +23,7 @@ public class EventsServiceImpl implements EventsService {
     private final EventRepository eventRepository;
 
     @Override
-    public List<EventDtoFull> getEvents(String text,
+    public List<Event> getEvents(String text,
                                         Long[] categories,
                                         String paid,
                                         String rangeStart,
@@ -42,14 +41,9 @@ public class EventsServiceImpl implements EventsService {
 
         Boolean isPaid = Boolean.parseBoolean(paid);
         Boolean isOnlyAvailable = Boolean.parseBoolean(onlyAvailable);
-        List<Event> eventList = eventRepository.getEventsPublic(text, categories, isPaid, rangeStartFormat, rangeEndFormat, isOnlyAvailable, page).getContent();
-        List<EventDtoFull> eventDtoFulls = new ArrayList<>();
 
-        for (Event next: eventList) {
-            eventDtoFulls.add(EventMapper.map(next));
-        }
-
-        return eventDtoFulls;
+        if (text != null)  return eventRepository.getEventsPublic(text, categories, isPaid, rangeStartFormat, rangeEndFormat, isOnlyAvailable, page).getContent();
+        else return eventRepository.findAll(page).getContent();
     }
 
     @Override
