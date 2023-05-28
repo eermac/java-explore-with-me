@@ -163,7 +163,7 @@ public class UserServiceImpl implements UserService {
         }
 
         Request request = RequestMapper.map(requester, event);
-        request.setStatus("CONFIRMED");
+        request.setStatus("PENDING");
         requestRepository.save(request);
 
         return RequestMapper.map(request);
