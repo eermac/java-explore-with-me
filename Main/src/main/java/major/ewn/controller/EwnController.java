@@ -1,7 +1,6 @@
 package major.ewn.controller;
 
 import major.events.dto.EventDtoFull;
-import major.events.model.Event;
 import major.events.service.EventsService;
 import major.ewn.StatsClient;
 import major.ewn.dto.StatisticsDto;
@@ -24,7 +23,7 @@ public class EwnController {
     private final EventsService eventsService;
 
     @GetMapping("/events")
-    public List<Event> getEvents(@RequestParam(name = "text", defaultValue = "") String text,
+    public List<EventDtoFull> getEvents(@RequestParam(name = "text", defaultValue = "") String text,
                                  @RequestParam(name = "categories", defaultValue = "") Long[] categories,
                                  @RequestParam(name = "paid", defaultValue = "") String paid,
                                  @RequestParam(name = "rangeStart", defaultValue = "1970-01-01 00:00:00") String rangeStart,
