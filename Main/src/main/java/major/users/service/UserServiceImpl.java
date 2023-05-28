@@ -156,13 +156,11 @@ public class UserServiceImpl implements UserService {
 
         if (requestRepository.getRequestsForUser(userId, eventId) != null
                 || event.getInitiator().getId().equals(userId)
-                || !event.getState().equals(EventState.PUBLISHED)
-                || requester.getId() == 99) {
+                || !event.getState().equals(EventState.PUBLISHED)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT);
         }
 
         Request request = RequestMapper.map(requester, event);
-        if (request.getId() == 2) request.setStatus("CONFIRMED");
         request.setStatus("PENDING");
         requestRepository.save(request);
 
