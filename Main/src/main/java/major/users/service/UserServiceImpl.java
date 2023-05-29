@@ -120,8 +120,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public RequestsDto updateRequestsForUserOnEvent(Long userId, Long eventId, RequestsStatus ids) {
         List<Request> requestList = requestRepository.getRequests(ids.getRequestIds());
-        Event event = eventRepository.findById(eventId).get();
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         RequestsDto requestsDto = new RequestsDto(new ArrayList<>(), new ArrayList<>());
+
+        if (event.getParticipantLimit() != 0 && event.getConfirmedRequests() >= event.getParticipantLimit()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT);
+        }
 
         for (Request request : requestList) {
             if (request.getStatus().equals("CANCELED") ||
