@@ -8,6 +8,7 @@ import major.events.model.Event;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import major.requests.dto.RequestDto;
+import major.requests.dto.RequestsDto;
 import major.users.dto.UserDto;
 import major.users.model.User;
 import major.users.service.UserService;
@@ -61,7 +62,7 @@ public class UserController {
     }
 
     @PatchMapping("/users/{userId}/events/{eventId}/requests")
-    public List<RequestDto> updateRequestsForUserOnEvent(@PathVariable Long userId, @PathVariable Long eventId, @RequestBody RequestsStatus ids) {
+    public RequestsDto updateRequestsForUserOnEvent(@PathVariable Long userId, @PathVariable Long eventId, @RequestBody RequestsStatus ids) {
         log.info("Обновляем запросы на событие текущего пользователя");
         return service.updateRequestsForUserOnEvent(userId, eventId, ids);
     }

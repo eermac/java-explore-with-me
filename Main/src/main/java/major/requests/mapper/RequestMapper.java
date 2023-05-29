@@ -2,6 +2,7 @@ package major.requests.mapper;
 
 import major.events.model.Event;
 import major.requests.dto.RequestDto;
+import major.requests.dto.RequestStatus;
 import major.requests.model.Request;
 import major.users.model.User;
 
@@ -21,6 +22,6 @@ public class RequestMapper {
                 request.getCreated(),
                 request.getEvent().getId(),
                 request.getRequester().getId(),
-                request.getStatus());
+                RequestStatus.valueOf(request.getStatus()));
     }
 }

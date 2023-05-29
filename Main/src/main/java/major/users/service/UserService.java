@@ -6,6 +6,7 @@ import major.events.dto.EventDtoState;
 import major.events.dto.RequestsStatus;
 import major.events.model.Event;
 import major.requests.dto.RequestDto;
+import major.requests.dto.RequestsDto;
 import major.users.dto.UserDto;
 import major.users.model.User;
 
@@ -22,7 +23,7 @@ public interface UserService {
 
     List<RequestDto> getRequestsForUserOnEvent(Long userId, Long eventId);
 
-    List<RequestDto> updateRequestsForUserOnEvent(Long userId, Long eventId, RequestsStatus ids);
+    RequestsDto updateRequestsForUserOnEvent(Long userId, Long eventId, RequestsStatus ids);
 
     List<RequestDto> getRequestsForUser(Long userId);
 

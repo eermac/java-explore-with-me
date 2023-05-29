@@ -14,6 +14,7 @@ import major.events.model.EventState;
 import major.events.repository.EventRepository;
 import major.events.repository.LocationRepository;
 import major.requests.dto.RequestDto;
+import major.requests.dto.RequestsDto;
 import major.requests.mapper.RequestMapper;
 import major.requests.model.Request;
 import major.requests.repository.RequestRepository;
@@ -117,24 +118,29 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<RequestDto> updateRequestsForUserOnEvent(Long userId, Long eventId, RequestsStatus ids) {
+    public RequestsDto updateRequestsForUserOnEvent(Long userId, Long eventId, RequestsStatus ids) {
         List<Request> requestList = requestRepository.getRequests(ids.getRequestIds());
         Event event = eventRepository.findById(eventId).get();
-        List<RequestDto> requestDtoList = new ArrayList<>();
+        RequestsDto requestsDto = new RequestsDto(new ArrayList<>(), new ArrayList<>());
 
-        for (Request next: requestList) {
-            next.setStatus(ids.getStatus());
-            if (event.getConfirmedRequests() >= event.getParticipantLimit()) {
+        for (Request request : requestList) {
+            if (request.getStatus().equals("CANCELED") ||
+                    (request.getStatus().equals("CONFIRMED") && ids.getStatus().equals("CANCELED"))) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT);
-            } else {
-                requestRepository.save(next);
+            }
+            if (ids.getStatus().equals("CONFIRMED") &&
+                    event.getConfirmedRequests() < event.getParticipantLimit()) {
+                request.setStatus(ids.getStatus());
+                requestsDto.getConfirmedRequests().add(RequestMapper.map(request));
                 event.setConfirmedRequests(event.getConfirmedRequests() + 1);
                 eventRepository.save(event);
-                requestDtoList.add(RequestMapper.map(next));
+            } else {
+                request.setStatus("REJECTED");
+                requestsDto.getRejectedRequests().add(RequestMapper.map(request));
             }
         }
 
-        return requestDtoList;
+        return requestsDto;
     }
 
     @Override
