@@ -44,7 +44,7 @@ public class EventsServiceImpl implements EventsService {
         if (onlyAvailable != null) isAvailable = Boolean.parseBoolean(onlyAvailable);
 
 
-        if (rangeStart != null && rangeStart != null) {
+        if (rangeStart != null && rangeEnd != null) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             rangeStartFormat = LocalDateTime.parse(rangeStart, formatter);
             rangeEndFormat = LocalDateTime.parse(rangeEnd, formatter);
