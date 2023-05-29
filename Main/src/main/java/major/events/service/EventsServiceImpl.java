@@ -25,7 +25,7 @@ public class EventsServiceImpl implements EventsService {
 
     @Override
     public List<EventDtoFull> getEvents(String text,
-                                        Long[] categories,
+                                 List<Long> categories,
                                         String paid,
                                         String rangeStart,
                                         String rangeEnd,
@@ -34,20 +34,27 @@ public class EventsServiceImpl implements EventsService {
                                         Integer from,
                                         Integer size) {
         PageRequest page = PageRequest.of(from > 0 ? from / size : 0, size);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime rangeStartFormat = LocalDateTime.parse(rangeStart, formatter);
-        LocalDateTime rangeEndFormat = LocalDateTime.parse(rangeEnd, formatter);
 
-        if (rangeStartFormat.isAfter(rangeEndFormat)) throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        LocalDateTime rangeStartFormat = null;
+        LocalDateTime rangeEndFormat = null;
 
-        Boolean isPaid = Boolean.parseBoolean(paid);
-        Boolean isOnlyAvailable = Boolean.parseBoolean(onlyAvailable);
-        List<Event> eventList;
+        Boolean isPaid = null;
+        Boolean isAvailable = false;
+        if (paid != null) isPaid = Boolean.parseBoolean(paid);
+        if (onlyAvailable != null) isAvailable = Boolean.parseBoolean(onlyAvailable);
+
+
+        if (rangeStart != null && rangeStart != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            rangeStartFormat = LocalDateTime.parse(rangeStart, formatter);
+            rangeEndFormat = LocalDateTime.parse(rangeEnd, formatter);
+
+            if (rangeStartFormat.isAfter(rangeEndFormat)) throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+
+        List<Event> eventList = eventRepository.getEventsPublic(text, categories, isPaid, rangeStartFormat, rangeEndFormat, isAvailable, sort, page).getContent();
+
         List<EventDtoFull> dto = new ArrayList<>();
-
-        if (text != null)  {
-            eventList = eventRepository.getEventsPublic(text, categories, isPaid, rangeStartFormat, rangeEndFormat, isOnlyAvailable, page).getContent();
-        } else eventList =  eventRepository.findAll(page).getContent();
 
         for (Event next: eventList) {
             dto.add(EventMapper.map(next));

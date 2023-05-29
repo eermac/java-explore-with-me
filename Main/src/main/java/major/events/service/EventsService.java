@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface EventsService {
     List<EventDtoFull> getEvents(String text,
-                          Long[] categories,
+                          List<Long> categories,
                           String paid,
                           String rangeStart,
                           String rangeEnd,
