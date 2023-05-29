@@ -21,4 +21,8 @@ public class Statistics {
     private String uri;
     private String ip;
     private LocalDateTime created;
+
+    public Statistics() {
+        super();
+    }
 }
