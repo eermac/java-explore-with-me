@@ -36,7 +36,7 @@ public class CompilationsController {
     public Compilations update(@RequestBody CompilationsDto dto, @PathVariable Long compId) {
         if (dto.getTitle() == null) dto.setTitle("default");
         else if (dto.getTitle().length() > 50) throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        log.info("Обновление  подборки");
+        log.info("Обновление подборки");
         return service.update(compId, dto);
     }
 }
