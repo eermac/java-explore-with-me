@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 
@@ -34,6 +35,7 @@ public class CompilationsController {
     @PatchMapping("/{compId}")
     public Compilations update(@RequestBody CompilationsDto dto, @PathVariable Long compId) {
         if (dto.getTitle() == null) dto.setTitle("default");
+        else if (dto.getTitle().length() > 50) throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         log.info("Обновление подборки");
         return service.update(compId, dto);
     }
