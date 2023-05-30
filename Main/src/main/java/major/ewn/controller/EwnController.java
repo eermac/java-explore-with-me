@@ -1,5 +1,9 @@
 package major.ewn.controller;
 
+import major.categories.model.Categories;
+import major.categories.service.CategoriesService;
+import major.compilations.model.Compilations;
+import major.compilations.service.CompilationsService;
 import major.events.dto.EventDtoFull;
 import major.events.service.EventsService;
 import major.ewn.StatsClient;
@@ -21,6 +25,8 @@ import java.util.List;
 public class EwnController {
     private final StatsClient statsClient;
     private final EventsService eventsService;
+    private final CompilationsService compilationsService;
+    private final CategoriesService categoriesService;
 
     @GetMapping("/events")
     public List<EventDtoFull> getEvents(@RequestParam(name = "text", required = false) String text,
@@ -55,5 +61,32 @@ public class EwnController {
         statsClient.saveStats(statisticsDto);
 
         return eventsService.getEvent(id);
+    }
+
+    @GetMapping("/compilations")
+    public List<Compilations> getAll(@RequestParam(name = "pinned", defaultValue = "false") String pinned,
+                                     @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
+                                     @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
+        log.info("Получаем все подборки");
+        return compilationsService.getAll(Boolean.parseBoolean(pinned), from, size);
+    }
+
+    @GetMapping("/compilations/{compId}")
+    public Compilations getCompilation(@PathVariable Long compId) {
+        log.info("Получение подборки");
+        return compilationsService.get(compId);
+    }
+
+    @GetMapping("/categories")
+    public List<Categories> getAll(@PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
+                                   @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
+        log.info("Получаем все категории");
+        return categoriesService.getAll(from, size);
+    }
+
+    @GetMapping("/categories/{catId}")
+    public Categories getCategories(@PathVariable Long catId) {
+        log.info("Получаем категорию");
+        return categoriesService.get(catId);
     }
 }

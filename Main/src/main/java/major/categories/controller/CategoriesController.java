@@ -10,45 +10,30 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/admin/categories")
 @Slf4j
 public class CategoriesController {
     private final CategoriesService service;
 
-    @PostMapping("/admin/categories")
+    @PostMapping
     public ResponseEntity<Categories> add(@Valid @RequestBody CategoriesDto categories) {
         log.info("Добавляем новую категорию");
         return new ResponseEntity<>(service.add(categories), HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/admin/categories/{catId}")
+    @DeleteMapping("/{catId}")
     public ResponseEntity<?> delete(@PathVariable Long catId) {
         log.info("Удаляем категорию");
         service.delete(catId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PatchMapping("/admin/categories/{catId}")
+    @PatchMapping("{catId}")
     public Categories update(@PathVariable Long catId, @Valid @RequestBody CategoriesDto categories) {
         log.info("Обновляем категорию");
         return service.update(catId, categories);
-    }
-
-    @GetMapping("/categories")
-    public List<Categories> getAll(@PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
-                                                   @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
-        log.info("Получаем все категории");
-        return service.getAll(from, size);
-    }
-
-    @GetMapping("/categories/{catId}")
-    public Categories get(@PathVariable Long catId) {
-        log.info("Получаем категорию");
-        return service.get(catId);
     }
 }

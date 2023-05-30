@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -38,12 +39,18 @@ public class CompilationsServiceImpl implements CompilationsService {
     public Compilations update(Long compId, CompilationsDto dto) {
         Compilations oldCompilation = repository.findById(compId).get();
 
-        if (dto.getTitle() != null) oldCompilation.setTitle(dto.getTitle());
-        if (dto.getPinned() != null) oldCompilation.setPinned(dto.getPinned());
-        if (dto.getEvents() != null) {
-            Set<Event> events = eventRepository.getEventsById(dto.getEvents());
-            oldCompilation.setEvents(events);
-        }
+//        if (dto.getTitle() != null) oldCompilation.setTitle(dto.getTitle());
+//        if (dto.getPinned() != null) oldCompilation.setPinned(dto.getPinned());
+//        if (dto.getEvents() != null) {
+//            Set<Event> events = eventRepository.getEventsById(dto.getEvents());
+//            oldCompilation.setEvents(events);
+//        }
+
+        oldCompilation.setTitle(dto.getTitle());
+        oldCompilation.setPinned(dto.getPinned());
+        Set<Event> events = eventRepository.getEventsById(dto.getEvents());
+        oldCompilation.setEvents(events);
+
 
         return repository.save(oldCompilation);
     }
