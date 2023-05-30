@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Set;
 
@@ -35,13 +36,14 @@ public class CompilationsServiceImpl implements CompilationsService {
     }
 
     @Override
-    public Compilations update(Long compId, CompilationsDto dto) {
+    public Compilations update(Long compId, @Valid CompilationsDto dto) {
         Compilations oldCompilation = repository.findById(compId).get();
 
-        oldCompilation.setTitle(dto.getTitle());
+        if (!dto.getTitle().equals("default")) oldCompilation.setTitle(dto.getTitle());
         oldCompilation.setPinned(dto.getPinned());
         Set<Event> events = eventRepository.getEventsById(dto.getEvents());
         oldCompilation.setEvents(events);
+
 
         return repository.save(oldCompilation);
     }

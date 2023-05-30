@@ -32,7 +32,8 @@ public class CompilationsController {
     }
 
     @PatchMapping("/{compId}")
-    public Compilations update(@Valid @RequestBody CompilationsDto dto, @PathVariable Long compId) {
+    public Compilations update(@RequestBody CompilationsDto dto, @PathVariable Long compId) {
+        if (dto.getTitle() == null) dto.setTitle("default");
         log.info("Обновление подборки");
         return service.update(compId, dto);
     }
