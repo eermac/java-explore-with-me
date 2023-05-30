@@ -40,6 +40,7 @@ public class CompilationsServiceImpl implements CompilationsService {
         Compilations oldCompilation = repository.findById(compId).get();
 
         if (!dto.getTitle().equals("default")) oldCompilation.setTitle(dto.getTitle());
+        else if (dto.getTitle().length() > 50) throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         oldCompilation.setPinned(dto.getPinned());
         Set<Event> events = eventRepository.getEventsById(dto.getEvents());
         oldCompilation.setEvents(events);
