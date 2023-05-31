@@ -1,4 +1,4 @@
-package ewn.dto;
+package major.ewn.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

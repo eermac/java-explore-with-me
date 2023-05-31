@@ -1,7 +1,7 @@
-package ewn;
+package major.ewn;
 
-import ewn.client.BaseClient;
-import ewn.dto.StatisticsDto;
+import major.ewn.client.BaseClient;
+import major.ewn.dto.StatisticsDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;

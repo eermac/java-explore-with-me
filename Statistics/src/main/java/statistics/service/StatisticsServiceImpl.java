@@ -2,13 +2,17 @@ package statistics.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import statistics.dto.ResponseDto;
 import statistics.dto.StatisticsDto;
 import statistics.mapper.StatisticsMapper;
 import statistics.model.Statistics;
 import statistics.repository.StatisticsRepository;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
@@ -34,12 +38,14 @@ public class StatisticsServiceImpl implements StatisticsService {
     public Set<ResponseDto> getStats(String start, String end, String[] uris, String unique) {
         List<Statistics> statisticsList = new ArrayList<>();
         Set<ResponseDto> responseDtoList = new TreeSet<>(userComparator);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        if (LocalDateTime.parse(start, formatter).isAfter(LocalDateTime.parse(end, formatter))) throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 
         if (uris.length > 0) {
             for (String next: uris) {
                 statisticsList.add(repository.findTop1ByUri(next));
             }
-        } else statisticsList = repository.findAll(); //тут может быть проблема с повторами
+        } else statisticsList = repository.findAll();
 
         if (Boolean.parseBoolean(unique)) {
             for (Statistics next: statisticsList) {
