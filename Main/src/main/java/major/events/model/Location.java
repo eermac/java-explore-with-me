@@ -1,9 +1,6 @@
 package major.events.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -13,14 +10,11 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Setter
 @ToString
+@NoArgsConstructor
 public class Location {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Double lat;
     private Double lon;
-
-    public Location() {
-        super();
-    }
 }

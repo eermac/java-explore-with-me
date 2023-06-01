@@ -2,6 +2,10 @@ package major.users.service;
 
 import major.categories.model.Categories;
 import major.categories.repository.CategoriesRepository;
+import major.comments.dto.CommentDto;
+import major.comments.mapper.CommentMapper;
+import major.comments.model.Comment;
+import major.comments.repository.CommentRepository;
 import major.events.dto.EventDto;
 import major.events.dto.EventDtoFull;
 import major.events.dto.EventDtoState;
@@ -42,6 +46,7 @@ public class UserServiceImpl implements UserService {
     private final LocationRepository locationRepository;
     private final RequestRepository requestRepository;
     private final CategoriesRepository categoriesRepository;
+    private final CommentRepository commentRepository;
 
     @Override
     public List<Event> getAllEventsForUser(Long userId, Integer from, Integer size) {
@@ -230,7 +235,7 @@ public class UserServiceImpl implements UserService {
         }
 
         if (dto.getCategory() != null) {
-             categories = categoriesRepository.findById(dto.getCategory()).get();
+            categories = categoriesRepository.findById(dto.getCategory()).get();
         }
 
         Event newEvent = EventMapper.map(event, dto, categories);
@@ -271,5 +276,60 @@ public class UserServiceImpl implements UserService {
         }
 
         return dto;
+    }
+
+    @Override
+    public Comment addComment(Long userId, Long eventId, CommentDto dto) {
+        User user = repository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        return commentRepository.save(CommentMapper.map(user, event, dto));
+    }
+
+    @Override
+    public List<Comment> getCommentsForUser(Long userId, Long eventId, Integer from, Integer size) {
+        PageRequest page = PageRequest.of(from > 0 ? from / size : 0, size);
+
+        return commentRepository.getAllCommentsForUser(userId, eventId, page).getContent();
+    }
+
+    @Override
+    public Comment getCommentForUser(Long userId, Long commentId) {
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        if (!comment.getUser().getId().equals(userId)) throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+
+        return comment;
+    }
+
+    @Override
+    public Comment updateComment(Long userId, CommentDto dto, Long commentId) {
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        if (!comment.getUser().getId().equals(userId)) throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        else comment.setMessage(dto.getMessage());
+
+        return commentRepository.save(comment);
+    }
+
+    @Override
+    public void deleteComment(Long userId, Long commentId) {
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        if (!comment.getUser().getId().equals(userId)) throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+
+        commentRepository.deleteById(commentId);
+    }
+
+    @Override
+    public void deleteCommentOnAdmin(Long commentId) {
+        commentRepository.findById(commentId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        commentRepository.deleteById(commentId);
+    }
+
+    @Override
+    public void deleteAllCommentOnAdmin(Long userId) {
+        List<Long> commentsId = commentRepository.getIdCommentsForUser(userId);
+        commentRepository.deleteAllById(commentsId);
     }
 }

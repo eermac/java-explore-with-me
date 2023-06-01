@@ -1,5 +1,7 @@
 package major.users.service;
 
+import major.comments.dto.CommentDto;
+import major.comments.model.Comment;
 import major.events.dto.EventDto;
 import major.events.dto.EventDtoFull;
 import major.events.dto.EventDtoState;
@@ -40,4 +42,18 @@ public interface UserService {
     EventDtoFull updateEventOnAdmin(Long eventId, EventDtoState dto);
 
     List<EventDtoFull> getEventsForAdmin(Long[] users, String states, Long[] categories, String rangeStart, String rangeEnd, Integer from, Integer size);
+
+    Comment addComment(Long userId, Long eventId, CommentDto dto);
+
+    List<Comment> getCommentsForUser(Long userId, Long eventId, Integer from, Integer size);
+
+    Comment getCommentForUser(Long userId, Long commentId);
+
+    Comment updateComment(Long userId, CommentDto dto, Long commentId);
+
+    void deleteComment(Long userId, Long commentId);
+
+    void deleteCommentOnAdmin(Long commentId);
+
+    void deleteAllCommentOnAdmin(Long userId);
 }

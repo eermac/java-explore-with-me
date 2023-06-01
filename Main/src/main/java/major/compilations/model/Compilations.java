@@ -1,9 +1,6 @@
 package major.compilations.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import major.events.model.Event;
 
 import javax.persistence.*;
@@ -15,6 +12,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Setter
 @ToString
+@NoArgsConstructor
 public class Compilations {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,8 +24,4 @@ public class Compilations {
     private Set<Event> events;
     private Boolean pinned;
     private String title;
-
-    public Compilations() {
-        super();
-    }
 }

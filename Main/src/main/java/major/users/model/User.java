@@ -1,9 +1,6 @@
 package major.users.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -15,6 +12,7 @@ import javax.validation.constraints.NotBlank;
 @AllArgsConstructor
 @Setter
 @ToString
+@NoArgsConstructor
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,8 +21,4 @@ public class User {
     private String name;
     @Email
     private String email;
-
-    public User() {
-        super();
-    }
 }

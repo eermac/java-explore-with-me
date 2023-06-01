@@ -1,9 +1,6 @@
 package major.events.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import major.categories.model.Categories;
 import major.users.model.User;
 
@@ -16,6 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Setter
 @ToString
+@NoArgsConstructor
 public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,9 +46,5 @@ public class Event {
     @Column(name = "confirmed_requests")
     private Long confirmedRequests;
     private Long views;
-
-    public Event() {
-        super();
-    }
 }
 
